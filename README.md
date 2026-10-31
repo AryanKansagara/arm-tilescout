@@ -23,7 +23,7 @@ An injected `(aarch64, dotprod, layout)` policy returns eligibility or fallback.
 
 `make test` passes **10 groups / 31 assertions**. One assertion checks the full generated corpus: **600** combinations of zero/odd/exact-tail dimensions, two layouts and three offsets match the independent indexing routine. The demo also counts detected seeded defects that drop the last tail column. Not every zero-output case can expose a dropped column, so the report gives detections rather than calling every injected case a detection. Other controls cover int8 extrema, padding and guard corruption, dispatch combinations, bad metadata, malformed partitions and shape bounds.
 
-`demo.json` and `test-results.txt` are local evidence. Prepared CI has not been run remotely. Output is exact integer comparison; the tool makes no quantization-scale, floating-point tolerance or throughput claim.
+`demo.json` and `test-results.txt` are local evidence. GitHub Actions runs the same checks; inspect Actions for the latest hosted result. Output is exact integer comparison; the tool makes no quantization-scale, floating-point tolerance or throughput claim.
 
 ## Sources and limitations
 
