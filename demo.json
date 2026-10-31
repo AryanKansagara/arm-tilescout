@@ -1,0 +1,8 @@
+{
+  "kind": "portable_packing_contract_fixture",
+  "cases": 600,
+  "reference_matches": 600,
+  "seeded_tail_defects_detected": 216,
+  "arm_instructions_executed": false,
+  "injected_capability_policy_only": true
+}

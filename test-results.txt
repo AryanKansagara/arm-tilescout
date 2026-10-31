@@ -1,0 +1,15 @@
+g++ -std=c++17 -O2 -Wall -Wextra -Wpedantic -Werror tests.cpp -o build/tests
+g++ -std=c++17 -O2 -Wall -Wextra -Wpedantic -Werror main.cpp -o build/tilescout
+./build/tests
+PASS authored independent golden matrix
+PASS 600 boundary layout offset cases
+PASS int8 extremes accumulate without saturation
+PASS capability policy and fallback
+PASS overlap hole reverse and overflow partitions
+PASS shape layout size metadata rejected
+PASS padding and guard corruption rejected
+PASS same sized incorrect packing detected by oracle
+PASS zero dimensions and exact tiles
+PASS bounded malformed input
+SUMMARY groups=10 assertions=31
+./build/tilescout demo > /dev/null

@@ -1,0 +1,9 @@
+{
+  "company": "Arm",
+  "title": "TileScout",
+  "test_command": "make test",
+  "demo_command": "./build/tilescout demo",
+  "scope": "Portable int8 packing, tail, partition and injected-dispatch contract lab; no Arm instructions or KleidiAI executed.",
+  "implemented": true,
+  "integration_status": "unverified"
+}

@@ -1,0 +1,15 @@
+#include "tilescout.hpp"
+#include <iostream>
+#include <functional>
+int main(){int groups=0,asserts=0;auto check=[&](bool b){++asserts;if(!b)throw std::runtime_error("assertion failed");};auto fails=[&](const std::function<void()>&f){try{f();return false;}catch(const std::runtime_error&){return true;}};auto test=[&](const char*n,const std::function<void()>&f){f();++groups;std::cout<<"PASS "<<n<<'\n';};try{
+test("authored independent golden matrix",[&]{tile::Matrix a{1,2,3,4,5,6},b{7,8,9,10,11,12};tile::Output gold{58,64,139,154};for(auto l:{tile::Layout::column_padded,tile::Layout::block4})check(tile::run(a,tile::pack(b,3,2,l,1),2,3,2,{{0,1},{1,2}})==gold);});
+test("600 boundary layout offset cases",[&]{auto d=tile::evaluate();check(d.cases==600);check(d.matches==d.cases);check(d.tail_defects>0);});
+test("int8 extremes accumulate without saturation",[&]{tile::Matrix a(64,127),b(64,-128);auto c=tile::run(a,tile::pack(b,64,1,tile::Layout::block4,7),1,64,1,{{0,1}});check(c[0]==-1040384);});
+test("capability policy and fallback",[&]{for(bool arm:{false,true})for(bool dot:{false,true})for(auto l:{tile::Layout::column_padded,tile::Layout::block4})check((tile::dispatch(arm,dot,l)=="eligible_portable_block4")== (arm&&dot&&l==tile::Layout::block4));});
+test("overlap hole reverse and overflow partitions",[&]{for(auto r:std::vector<std::vector<tile::Range>>{{{0,2},{1,3}},{{0,1},{2,3}},{{2,1}},{{0,4}}})check(fails([&]{tile::partitions(3,r);}));});
+test("shape layout size metadata rejected",[&]{auto p=tile::pack({1,2,3,4},2,2,tile::Layout::block4,0);auto q=p;q.k=3;check(fails([&]{tile::validate(q,2,2);}));q=p;q.bytes.pop_back();check(fails([&]{tile::validate(q,2,2);}));q=p;q.layout=static_cast<tile::Layout>(99);check(fails([&]{tile::validate(q,2,2);}));});
+test("padding and guard corruption rejected",[&]{auto p=tile::pack({1},1,1,tile::Layout::block4,1);auto q=p;q.bytes[tile::index(q,2,2)]=9;check(fails([&]{tile::validate(q,1,1);}));q=p;q.bytes[0]=0;check(fails([&]{tile::validate(q,1,1);}));q=p;q.bytes.back()=0;check(fails([&]{tile::validate(q,1,1);}));});
+test("same sized incorrect packing detected by oracle",[&]{tile::Matrix a{1,2,3},b{1,2,3,4,5,6};auto p=tile::pack(b,3,2,tile::Layout::block4,0);p.layout=tile::Layout::column_padded;check(fails([&]{auto c=tile::run(a,p,1,3,2,{{0,1}});if(c!=tile::reference(a,b,1,3,2))throw std::runtime_error("mismatch");}));});
+test("zero dimensions and exact tiles",[&]{check(tile::run({},tile::pack({},0,4,tile::Layout::block4,0),3,0,4,{{0,3}})==tile::Output(12,0));check(tile::run({},tile::pack({},4,0,tile::Layout::block4,0),0,4,0,{}).empty());});
+test("bounded malformed input",[&]{check(fails([&]{tile::pack({},65,0,tile::Layout::block4,0);}));check(fails([&]{tile::pack({},1,1,tile::Layout::block4,0);}));check(fails([&]{tile::pack({},0,0,tile::Layout::block4,8);}));check(fails([&]{tile::run({},tile::pack({1},1,1,tile::Layout::block4,0),1,1,1,{{0,1}});}));});
+std::cout<<"SUMMARY groups="<<groups<<" assertions="<<asserts<<'\n';return 0;}catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}}
